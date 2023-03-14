@@ -1,0 +1,31 @@
+name: Update Google Functions
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update_gf:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - id: 'checkout'
+      uses: actions/checkout@v3
+
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        workload_identity_provider: 'projects/${{ vars.PROJECT_ID }}/locations/global/workloadIdentityPools/${{ vars.POOL }}/providers/${{ vars.PROVIDER }}'
+        service_account: '${{ vars.SERVICE_ACCOUNT }}'
+
+    - id: 'deploy'
+      uses: 'google-github-actions/deploy-cloud-functions@v1'
+      with:
+        name: '${{ vars.FUNCTION_NAME }}'
+        runtime: 'python310'
+        region: '${{ vars.REGION }}'

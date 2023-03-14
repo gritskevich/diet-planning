@@ -1,0 +1,30 @@
+name: Upload Folder to Google Cloud Storage
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  upload_to_gcs:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - id: 'checkout'
+      uses: actions/checkout@v3
+
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        workload_identity_provider: 'projects/${{ vars.PROJECT_ID }}/locations/global/workloadIdentityPools/${{ vars.POOL }}/providers/${{ vars.PROVIDER }}'
+        service_account: '${{ vars.SERVICE_ACCOUNT }}'
+
+    - id: 'upload-folder'
+      uses: 'google-github-actions/upload-cloud-storage@v1'
+      with:
+        path: 'model/nutrition'
+        destination: '${{ vars.BUCKET }}'
